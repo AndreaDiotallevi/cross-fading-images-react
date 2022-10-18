@@ -1,26 +1,58 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import styled, { keyframes } from "styled-components"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const IMAGE_DURATION = 4
+const IMAGE_FADE = 1.5
+
+const animation = (animationDuration: number) => keyframes`
+    0% {
+        opacity: 1;
+    }
+    ${`${(IMAGE_DURATION / animationDuration) * 100}%`} {
+        opacity: 1;
+    }
+    ${`${((IMAGE_DURATION + IMAGE_FADE) / animationDuration) * 100}%`} {
+        opacity: 0;
+    }
+    ${`${100 - (IMAGE_FADE / animationDuration) * 100}%`} {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+`
+
+const ImageContainer = styled.div<{ animationDuration: number }>`
+    animation-name: ${(props) => animation(props.animationDuration)};
+`
+
+type Props = {
+    images: string[]
 }
 
-export default App;
+function App(props: Props) {
+    const { images } = props
+    const animationDuration = (IMAGE_DURATION + IMAGE_FADE) * images.length
+
+    return (
+        <div className="position-relative">
+            {images.map((image, index) => (
+                <ImageContainer
+                    key={image}
+                    animationDuration={animationDuration}
+                    style={{
+                        top: 0,
+                        position: "absolute",
+                        animationIterationCount: "infinite",
+                        animationTimingFunction: "ease-in-out",
+                        animationDuration: `${animationDuration}s`,
+                        animationDelay: `${(IMAGE_DURATION + IMAGE_FADE) * (index - images.length)}s`,
+                    }}
+                >
+                    <img src={image} alt="art" />
+                </ImageContainer>
+            ))}
+        </div>
+    )
+}
+
+export default App
